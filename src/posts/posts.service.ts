@@ -1,23 +1,34 @@
 import { Injectable } from '@nestjs/common';
+import { NotFoundException } from '@nestjs/common/exceptions';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
+import { PostRepository } from './post.repository';
+import { Post } from '@prisma/client';
 
 @Injectable()
 export class PostsService {
-  create(createPostDto: CreatePostDto) {
-    return 'This action adds a new post';
+  constructor(private readonly postRepository: PostRepository) {}
+
+  async create(createPostDto: CreatePostDto) {
+    return this.postRepository.createPost(createPostDto);
   }
 
-  findAll() {
-    return `This action returns all posts`;
+  async findAll(): Promise<Post[]> {
+    return this.postRepository.listPosts();
   }
 
   findOne(id: number) {
-    return `This action returns a #${id} post`;
+    return this.postRepository.listOnePost({ id });
   }
 
-  update(id: number, updatePostDto: UpdatePostDto) {
-    return `This action updates a #${id} post`;
+  async update(id: number, updatePostDto: UpdatePostDto) {
+    const post = await this.postRepository.updateOne({ id }, updatePostDto);
+
+    if (!post) {
+      throw new NotFoundException();
+    }
+
+    return post;
   }
 
   remove(id: number) {
