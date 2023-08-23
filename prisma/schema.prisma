@@ -39,6 +39,7 @@ model Publication {
   mediaId   Int
   post      Post     @relation(fields: [postId], references: [id])
   postId    Int
+  date      DateTime
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 

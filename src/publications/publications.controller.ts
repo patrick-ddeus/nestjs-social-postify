@@ -1,4 +1,13 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  Query,
+} from '@nestjs/common';
 import { PublicationsService } from './publications.service';
 import { CreatePublicationDto } from './dto/create-publication.dto';
 import { UpdatePublicationDto } from './dto/update-publication.dto';
@@ -8,13 +17,16 @@ export class PublicationsController {
   constructor(private readonly publicationsService: PublicationsService) {}
 
   @Post()
-  create(@Body() createPublicationDto: CreatePublicationDto) {
-    return this.publicationsService.create(createPublicationDto);
+  async create(@Body() createPublicationDto: CreatePublicationDto) {
+    return await this.publicationsService.create(createPublicationDto);
   }
 
   @Get()
-  findAll() {
-    return this.publicationsService.findAll();
+  findAll(
+    @Query('published') published?: string,
+    @Query('after') after?: string,
+  ) {
+    return this.publicationsService.findAll(published, after);
   }
 
   @Get(':id')
@@ -23,7 +35,10 @@ export class PublicationsController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updatePublicationDto: UpdatePublicationDto) {
+  update(
+    @Param('id') id: string,
+    @Body() updatePublicationDto: UpdatePublicationDto,
+  ) {
     return this.publicationsService.update(+id, updatePublicationDto);
   }
 

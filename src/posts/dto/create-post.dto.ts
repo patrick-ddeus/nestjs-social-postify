@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsString, IsOptional } from 'class-validator';
+import { IsNotEmpty, IsString, IsOptional, IsUrl } from 'class-validator';
 
 export class CreatePostDto {
   @IsNotEmpty()
@@ -11,5 +11,6 @@ export class CreatePostDto {
 
   @IsString()
   @IsOptional()
+  @IsUrl({ require_protocol: true })
   image: string;
 }
