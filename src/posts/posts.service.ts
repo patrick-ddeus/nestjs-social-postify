@@ -10,19 +10,19 @@ export class PostsService {
   constructor(private readonly postRepository: PostRepository) {}
 
   async create(createPostDto: CreatePostDto) {
-    return this.postRepository.createPost(createPostDto);
+    return this.postRepository.create(createPostDto);
   }
 
   async findAll(): Promise<Post[]> {
-    return this.postRepository.listPosts();
+    return this.postRepository.listAll();
   }
 
   findOne(id: number) {
-    return this.postRepository.listOnePost({ id });
+    return this.postRepository.listOne({ id });
   }
 
   async update(id: number, updatePostDto: UpdatePostDto) {
-    const post = await this.postRepository.updateOne({ id }, updatePostDto);
+    const post = await this.postRepository.update({ id }, updatePostDto);
 
     if (!post) {
       throw new NotFoundException();

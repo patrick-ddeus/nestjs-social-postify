@@ -1,26 +1,79 @@
 import { Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  ForbiddenException,
+  NotFoundException,
+} from '@nestjs/common/exceptions';
 import { CreateMediaDto } from './dto/create-media.dto';
 import { UpdateMediaDto } from './dto/update-media.dto';
+import { MediaRepository } from './media.repository';
 
 @Injectable()
 export class MediasService {
-  create(createMediaDto: CreateMediaDto) {
-    return 'This action adds a new media';
+  constructor(private readonly mediaRepository: MediaRepository) {}
+
+  async create(createMediaDto: CreateMediaDto) {
+    const { username, title } = createMediaDto;
+    await this.checkUsernameConflict(username, title);
+
+    return this.mediaRepository.create(createMediaDto);
   }
 
   findAll() {
-    return `This action returns all medias`;
+    return this.mediaRepository.listAll();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} media`;
+  async findOne(id: number) {
+    const medias = await this.mediaRepository.listOne({ id });
+
+    if (!medias) {
+      throw new NotFoundException();
+    }
+
+    return medias;
   }
 
-  update(id: number, updateMediaDto: UpdateMediaDto) {
-    return `This action updates a #${id} media`;
+  async update(id: number, updateMediaDto: UpdateMediaDto) {
+    const { username, title } = updateMediaDto;
+    await this.checkUsernameConflict(username, title);
+
+    return this.mediaRepository.update({ id }, updateMediaDto);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} media`;
+  async remove(id: number) {
+    const media = await this.mediaRepository.listOne({
+      Post: {
+        some: {
+          mediaId: id,
+        },
+      },
+    });
+
+    if (media) {
+      throw new ForbiddenException();
+    }
+    try {
+      const deletedMedia = await this.mediaRepository.delete({ id });
+      return deletedMedia;
+    } catch (error) {
+      throw new NotFoundException();
+    }
+  }
+
+  private async checkUsernameConflict(username: string, title: string) {
+    const user = await this.mediaRepository.listOne({
+      AND: [
+        {
+          username,
+        },
+        {
+          title,
+        },
+      ],
+    });
+
+    if (user) {
+      throw new ConflictException();
+    }
   }
 }

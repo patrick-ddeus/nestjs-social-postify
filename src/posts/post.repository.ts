@@ -6,23 +6,23 @@ import { Post, Prisma } from '@prisma/client';
 export class PostRepository {
   constructor(private prisma: PrismaService) {}
 
-  async createPost(data: Prisma.PostCreateInput): Promise<Post> {
+  async create(data: Prisma.PostCreateInput): Promise<Post> {
     return this.prisma.post.create({
       data,
     });
   }
 
-  async listPosts(): Promise<Post[]> {
+  async listAll(): Promise<Post[]> {
     return this.prisma.post.findMany({});
   }
 
-  async listOnePost(where: Prisma.PostWhereInput): Promise<Post> {
+  async listOne(where: Prisma.PostWhereInput): Promise<Post> {
     return this.prisma.post.findFirst({
       where,
     });
   }
 
-  async updateOne(
+  async update(
     where: Prisma.PostWhereUniqueInput,
     data: Prisma.PostUpdateInput,
   ) {
