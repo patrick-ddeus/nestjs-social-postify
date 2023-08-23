@@ -1,8 +1,11 @@
 import { Injectable } from '@nestjs/common';
-import { NotFoundException } from '@nestjs/common/exceptions';
+import {
+  ForbiddenException,
+  NotFoundException,
+} from '@nestjs/common/exceptions';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
-import { PostRepository } from './post.repository';
+import { PostRepository } from './posts.repository';
 import { Post } from '@prisma/client';
 
 @Injectable()
@@ -31,7 +34,25 @@ export class PostsService {
     return post;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} post`;
+  async remove(id: number) {
+    const post = await this.postRepository.listOne({
+      Media: {
+        some: {
+          postId: id,
+        },
+      },
+    });
+
+    if (post) {
+      throw new ForbiddenException(
+        'You must remove the publication before remove post',
+      );
+    }
+    try {
+      const deletedMedia = await this.postRepository.delete({ id });
+      return deletedMedia;
+    } catch (error) {
+      throw new NotFoundException();
+    }
   }
 }

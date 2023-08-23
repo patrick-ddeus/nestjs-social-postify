@@ -1,15 +1,15 @@
 import { PrismaService } from '@/database';
 
-export class MediaFactory {
+export class PostFactory {
   private readonly prisma: PrismaService;
 
   constructor() {
     this.prisma = new PrismaService();
   }
 
-  async create(title: string, username: string) {
-    return await this.prisma.media.create({
-      data: { title, username },
+  async create(title: string, text: string) {
+    return await this.prisma.post.create({
+      data: { title, text },
     });
   }
 }

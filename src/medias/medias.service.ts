@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common/exceptions';
 import { CreateMediaDto } from './dto/create-media.dto';
 import { UpdateMediaDto } from './dto/update-media.dto';
-import { MediaRepository } from './media.repository';
+import { MediaRepository } from './medias.repository';
 
 @Injectable()
 export class MediasService {

@@ -8,11 +8,7 @@ import { MediaFactory } from './factories/media.factory';
 const helper = new Helpers();
 const mediaFactory = new MediaFactory();
 
-beforeAll(async () => {
-  helper.cleanDb();
-});
-
-describe('MediaController (e2e)', () => {
+describe('MediasController (e2e)', () => {
   let app: INestApplication;
 
   beforeEach(async () => {
@@ -20,11 +16,12 @@ describe('MediaController (e2e)', () => {
       imports: [MediasModule],
     }).compile();
 
+    helper.cleanDb();
     app = moduleFixture.createNestApplication();
     await app.init();
   });
 
-  it('/medias (GET)', async () => {
+  it('/medias (GET) should return all medias with status code 200', async () => {
     const media = await mediaFactory.create(
       'Instagram',
       'https://www.instagram.com/USERNAME',

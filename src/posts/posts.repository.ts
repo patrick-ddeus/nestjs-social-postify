@@ -31,4 +31,10 @@ export class PostRepository {
       data,
     });
   }
+
+  delete(where: Prisma.PostWhereUniqueInput) {
+    return this.prisma.post.delete({
+      where,
+    });
+  }
 }
