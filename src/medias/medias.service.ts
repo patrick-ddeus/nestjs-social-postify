@@ -50,7 +50,9 @@ export class MediasService {
     });
 
     if (media) {
-      throw new ForbiddenException();
+      throw new ForbiddenException(
+        'You must remove the publication before media',
+      );
     }
     try {
       const deletedMedia = await this.mediaRepository.delete({ id });

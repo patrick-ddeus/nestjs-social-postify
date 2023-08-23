@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  ForbiddenException,
+} from '@nestjs/common';
 import { CreatePublicationDto } from './dto/create-publication.dto';
 import { UpdatePublicationDto } from './dto/update-publication.dto';
 import { PublicationsRepository } from './publications.repository';
@@ -65,11 +69,30 @@ export class PublicationsService {
     });
   }
 
-  findOne(id: number) {
-    return this.publicationsRepository.listOne({ id });
+  async findOne(id: number) {
+    const publication = await this.publicationsRepository.listOne({ id });
+
+    if (!publication) {
+      throw new NotFoundException();
+    }
+
+    return publication;
   }
 
-  update(id: number, updatePublicationDto: UpdatePublicationDto) {
+  async update(id: number, updatePublicationDto: UpdatePublicationDto) {
+    const publicationToUpdate = await this.publicationsRepository.listOne({
+      id,
+    });
+    const now = new Date();
+
+    if (!publicationToUpdate) {
+      throw new NotFoundException();
+    }
+
+    if (publicationToUpdate.date < now) {
+      throw new ForbiddenException();
+    }
+
     return this.publicationsRepository.update({ id }, updatePublicationDto);
   }
 
