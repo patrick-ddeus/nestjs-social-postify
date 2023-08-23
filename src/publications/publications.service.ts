@@ -96,7 +96,12 @@ export class PublicationsService {
     return this.publicationsRepository.update({ id }, updatePublicationDto);
   }
 
-  remove(id: number) {
-    return this.publicationsRepository.delete({ id });
+  async remove(id: number) {
+    try {
+      const publication = await this.publicationsRepository.delete({ id });
+      return publication;
+    } catch (error) {
+      throw new NotFoundException();
+    }
   }
 }
