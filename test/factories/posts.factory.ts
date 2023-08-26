@@ -1,17 +1,18 @@
 import { PrismaService } from '@/database';
 import { faker } from '@faker-js/faker';
+import { Injectable } from '@nestjs/common';
 
+@Injectable()
 export class PostFactory {
-  private readonly prisma: PrismaService;
-
-  constructor() {
-    this.prisma = new PrismaService();
-  }
+  constructor(private readonly prisma: PrismaService) {}
 
   async create(title: string, text: string) {
-    return await this.prisma.post.create({
+    const response = await this.prisma.post.create({
       data: { title, text },
     });
+    await this.prisma.$disconnect();
+
+    return response;
   }
 
   static build() {

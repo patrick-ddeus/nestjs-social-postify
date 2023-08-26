@@ -1,14 +1,12 @@
 import { PrismaService } from '@/database';
+import { Injectable } from '@nestjs/common';
 
+@Injectable()
 export class PublicationFactory {
-  private readonly prisma: PrismaService;
-
-  constructor() {
-    this.prisma = new PrismaService();
-  }
+  constructor(private readonly prisma: PrismaService) {}
 
   async create(mediaId: number, postId: number, date: Date) {
-    return await this.prisma.publication.create({
+    const response = await this.prisma.publication.create({
       data: {
         media: {
           connect: {
@@ -23,5 +21,7 @@ export class PublicationFactory {
         date,
       },
     });
+    await this.prisma.$disconnect();
+    return response;
   }
 }

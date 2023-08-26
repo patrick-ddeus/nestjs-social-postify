@@ -1,17 +1,17 @@
 import { PrismaService } from '@/database';
 import { faker } from '@faker-js/faker';
+import { Injectable } from '@nestjs/common';
 
+@Injectable()
 export class MediaFactory {
-  private readonly prisma: PrismaService;
-
-  constructor() {
-    this.prisma = new PrismaService();
-  }
+  constructor(private readonly prisma: PrismaService) {}
 
   async create(title: string, username: string) {
-    return await this.prisma.media.create({
+    const response = await this.prisma.media.create({
       data: { title, username },
     });
+    await this.prisma.$disconnect();
+    return response;
   }
 
   static build() {

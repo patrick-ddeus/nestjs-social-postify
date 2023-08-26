@@ -6,26 +6,54 @@ import { Helpers } from './helpers';
 import { MediaFactory } from './factories/media.factory';
 import { PostFactory, PublicationFactory } from './factories';
 
-const helper = new Helpers();
-
-const mediaFactory = new MediaFactory();
-const publicationFactory = new PublicationFactory();
-const postFactory = new PostFactory();
-
 describe('MediasController (e2e)', () => {
   let app: INestApplication;
   let server: request.SuperTest<request.Test>;
+  let mediaFactory: MediaFactory;
+  let publicationFactory: PublicationFactory;
+  let postFactory: PostFactory;
+  let helper: Helpers;
 
-  beforeEach(async () => {
+  beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [MediasModule],
+      providers: [MediaFactory, PublicationFactory, PostFactory, Helpers],
     }).compile();
 
-    await helper.cleanDb();
+    mediaFactory = moduleFixture.get<MediaFactory>(MediaFactory);
+    publicationFactory =
+      moduleFixture.get<PublicationFactory>(PublicationFactory);
+    postFactory = moduleFixture.get<PostFactory>(PostFactory);
+    helper = moduleFixture.get<Helpers>(Helpers);
+
     app = moduleFixture.createNestApplication();
     app.useGlobalPipes(new ValidationPipe());
     await app.init();
     server = request(app.getHttpServer());
+  });
+
+  beforeEach(async () => {
+    await helper.cleanDb();
+  });
+
+  describe('/medias (POST)', () => {
+    it('should return 409 when there is already a username and title registered', async () => {
+      const media = await mediaFactory.create(
+        'Instagram',
+        'https://www.instagram.com/USERNAME',
+      );
+      const { status } = await server.post(`/medias`).send(media);
+
+      expect(status).toBe(409);
+    });
+
+    it('should return 201 when media is created', async () => {
+      const media = MediaFactory.build();
+
+      const { status } = await server.post(`/medias`).send(media);
+
+      expect(status).toBe(201);
+    });
   });
 
   it('/medias (GET) should return all medias with status code 200', async () => {

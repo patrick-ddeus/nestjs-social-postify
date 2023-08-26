@@ -7,7 +7,6 @@ import {
 import { CreateMediaDto } from './dto/create-media.dto';
 import { UpdateMediaDto } from './dto/update-media.dto';
 import { MediaRepository } from './medias.repository';
-import { exclude } from '../common/helper/prisma-utils';
 
 @Injectable()
 export class MediasService {

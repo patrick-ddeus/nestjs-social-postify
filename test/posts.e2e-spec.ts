@@ -7,26 +7,50 @@ import { PostFactory } from './factories/posts.factory';
 import { PrismaModule } from '../src/database';
 import { MediaFactory, PublicationFactory } from './factories';
 
-const helper = new Helpers();
-
-const mediaFactory = new MediaFactory();
-const publicationFactory = new PublicationFactory();
-const postFactory = new PostFactory();
-
 describe('PostsController (e2e)', () => {
   let app: INestApplication;
   let server: request.SuperTest<request.Test>;
+  let mediaFactory: MediaFactory;
+  let publicationFactory: PublicationFactory;
+  let postFactory: PostFactory;
+  let helper: Helpers;
 
-  beforeEach(async () => {
+  beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [PostsModule, PrismaModule],
+      providers: [MediaFactory, PublicationFactory, PostFactory, Helpers],
     }).compile();
 
-    await helper.cleanDb();
+    mediaFactory = moduleFixture.get<MediaFactory>(MediaFactory);
+    publicationFactory =
+      moduleFixture.get<PublicationFactory>(PublicationFactory);
+    postFactory = moduleFixture.get<PostFactory>(PostFactory);
+    helper = moduleFixture.get<Helpers>(Helpers);
+
     app = moduleFixture.createNestApplication();
     app.useGlobalPipes(new ValidationPipe());
     await app.init();
     server = request(app.getHttpServer());
+  });
+
+  beforeEach(async () => {
+    await helper.cleanDb();
+  });
+
+  describe('/posts (POST)', () => {
+    it('should return 400 when body is invalid', async () => {
+      const { status } = await server.post(`/posts`).send({ name: '12345' });
+
+      expect(status).toBe(400);
+    });
+
+    it('should return 201 when media is created', async () => {
+      const { status } = await server
+        .post(`/posts`)
+        .send({ title: 'instagram', text: 'texto teste' });
+
+      expect(status).toBe(201);
+    });
   });
 
   describe('/posts (GET)', () => {

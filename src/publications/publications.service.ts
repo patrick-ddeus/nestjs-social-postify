@@ -6,7 +6,6 @@ import {
 import { CreatePublicationDto } from './dto/create-publication.dto';
 import { UpdatePublicationDto } from './dto/update-publication.dto';
 import { PublicationsRepository } from './publications.repository';
-import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class PublicationsService {
@@ -43,29 +42,14 @@ export class PublicationsService {
 
   async findAll(published: boolean, after: Date) {
     const now = new Date();
-    const where: Prisma.PublicationWhereInput = {
-      AND: [],
-    };
-
-    if (published) {
-      (where.AND as Prisma.PublicationWhereInput[]).push({
-        date: {
-          lte: now,
-        },
-      });
-    }
-
-    if (after) {
-      (where.AND as Prisma.PublicationWhereInput[]).push({
-        date: {
-          gte: after,
-          lte: now,
-        },
-      });
-    }
 
     return await this.publicationsRepository.listAll({
-      where,
+      where: {
+        date: {
+          gte: after ? after : undefined,
+          lte: published || after ? now : undefined,
+        },
+      },
     });
   }
 

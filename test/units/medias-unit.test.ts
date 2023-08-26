@@ -4,13 +4,12 @@ import { PrismaService } from '@/database';
 import { MediaFactory } from '../factories';
 import { NotFoundException, ConflictException } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
-import { exclude } from '../../src/common/helper/prisma-utils';
 
 describe('Media unit tests', () => {
   let service: MediasService;
   let repository: MediaRepository;
 
-  beforeEach(async () => {
+  beforeAll(async () => {
     const moduleRef = await Test.createTestingModule({
       providers: [MediaRepository, MediasService, PrismaService],
     }).compile();

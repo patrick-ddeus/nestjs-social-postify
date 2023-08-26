@@ -1,11 +1,9 @@
 import { PrismaService } from '@/database';
+import { Injectable } from '@nestjs/common';
 
+@Injectable()
 export class Helpers {
-  private readonly prisma: PrismaService;
-
-  constructor() {
-    this.prisma = new PrismaService();
-  }
+  constructor(private readonly prisma: PrismaService) {}
 
   async cleanDb() {
     const tablenames = await this.prisma.$queryRaw<
