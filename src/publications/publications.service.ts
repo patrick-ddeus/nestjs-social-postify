@@ -40,25 +40,24 @@ export class PublicationsService {
     }
   }
 
-  async findAll(published: string, after: string) {
-    const afterDate = new Date(after);
+  async findAll(published: boolean, after: Date) {
     const now = new Date();
     const where: Prisma.PublicationWhereInput = {
       AND: [],
     };
 
-    if (published === 'true') {
-      ((where.AND as Prisma.PublicationWhereInput[]) || []).push({
+    if (published) {
+      (where.AND as Prisma.PublicationWhereInput[]).push({
         date: {
           lte: now,
         },
       });
     }
 
-    if (afterDate.getDate()) {
-      ((where.AND as Prisma.PublicationWhereInput[]) || []).push({
+    if (after) {
+      (where.AND as Prisma.PublicationWhereInput[]).push({
         date: {
-          gte: afterDate,
+          gte: after,
           lte: now,
         },
       });

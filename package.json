@@ -18,7 +18,8 @@
     "test:cov": "jest --coverage",
     "test:migration:generate": "npm run test:load-envs prisma migrate dev",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "cross-env NODE_ENV=test jest --config ./test/jest-e2e.json",
+    "test:e2e": "cross-env NODE_ENV=test jest --runInBand --config ./test/jest-e2e.json",
+    "test:e2e:watch": "cross-env NODE_ENV=test jest --watch --runInBand --config ./test/jest-e2e.json",
     "test:load-envs": "dotenv -e .env.test"
   },
   "dependencies": {
@@ -40,6 +41,7 @@
     "rxjs": "^7.2.0"
   },
   "devDependencies": {
+    "@faker-js/faker": "^8.0.2",
     "@nestjs/cli": "^9.0.0",
     "@nestjs/schematics": "^9.0.0",
     "@nestjs/testing": "^9.0.0",
@@ -77,7 +79,7 @@
       "^.+\\.(t|j)s$": "ts-jest"
     },
     "collectCoverageFrom": [
-      "**/*.(t|j)s"
+      "*/.(t|j)s"
     ],
     "coverageDirectory": "../coverage",
     "testEnvironment": "node",

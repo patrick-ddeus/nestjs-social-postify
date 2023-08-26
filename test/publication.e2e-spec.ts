@@ -1,9 +1,10 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { INestApplication } from '@nestjs/common';
+import { INestApplication, ValidationPipe } from '@nestjs/common';
 import * as request from 'supertest';
 import { Helpers } from './helpers';
 import { PublicationFactory, MediaFactory, PostFactory } from './factories';
 import { PublicationsModule } from '../src/publications/publications.module';
+import { PrismaModule } from '../src/database';
 
 const helper = new Helpers();
 
@@ -16,11 +17,12 @@ describe('PublicationsController (e2e)', () => {
 
   beforeEach(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [PublicationsModule],
+      imports: [PublicationsModule, PrismaModule],
     }).compile();
 
-    helper.cleanDb();
+    await helper.cleanDb();
     app = moduleFixture.createNestApplication();
+    app.useGlobalPipes(new ValidationPipe());
     await app.init();
   });
 

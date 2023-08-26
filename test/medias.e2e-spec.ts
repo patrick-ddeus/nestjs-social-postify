@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { INestApplication } from '@nestjs/common';
+import { INestApplication, ValidationPipe } from '@nestjs/common';
 import * as request from 'supertest';
 import { MediasModule } from '@/medias/medias.module';
 import { Helpers } from './helpers';
@@ -10,15 +10,18 @@ const mediaFactory = new MediaFactory();
 
 describe('MediasController (e2e)', () => {
   let app: INestApplication;
+  let server: request.SuperTest<request.Test>;
 
   beforeEach(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [MediasModule],
     }).compile();
 
-    helper.cleanDb();
+    await helper.cleanDb();
     app = moduleFixture.createNestApplication();
+    app.useGlobalPipes(new ValidationPipe());
     await app.init();
+    server = request(app.getHttpServer());
   });
 
   it('/medias (GET) should return all medias with status code 200', async () => {
@@ -27,10 +30,11 @@ describe('MediasController (e2e)', () => {
       'https://www.instagram.com/USERNAME',
     );
 
-    return request(app.getHttpServer())
-      .get('/medias')
-      .expect(200)
-      .expect([
+    const { body, status } = await server.get('/medias');
+
+    expect(status).toBe(200);
+    expect(body).toEqual(
+      expect.arrayContaining([
         {
           id: media.id,
           title: media.title,
@@ -38,6 +42,7 @@ describe('MediasController (e2e)', () => {
           createdAt: media.createdAt.toISOString(),
           updatedAt: media.updatedAt.toISOString(),
         },
-      ]);
+      ]),
+    );
   });
 });

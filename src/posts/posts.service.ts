@@ -35,24 +35,15 @@ export class PostsService {
   }
 
   async remove(id: number) {
-    const post = await this.postRepository.listOne({
-      Media: {
-        some: {
-          postId: id,
-        },
-      },
-    });
-
-    if (post) {
-      throw new ForbiddenException(
-        'You must remove the publication before remove post',
-      );
-    }
     try {
       const deletedMedia = await this.postRepository.delete({ id });
       return deletedMedia;
     } catch (error) {
-      throw new NotFoundException();
+      if (error.code === 'P2003')
+        throw new ForbiddenException(
+          'You must remove the publication before media',
+        );
+      if (error.code === 'P2025') throw new NotFoundException();
     }
   }
 }
