@@ -7,6 +7,7 @@ import {
 import { CreateMediaDto } from './dto/create-media.dto';
 import { UpdateMediaDto } from './dto/update-media.dto';
 import { MediaRepository } from './medias.repository';
+import { exclude } from '../common/helper/prisma-utils';
 
 @Injectable()
 export class MediasService {
@@ -37,7 +38,11 @@ export class MediasService {
     const { username, title } = updateMediaDto;
     await this.checkUsernameConflict(username, title);
 
-    return this.mediaRepository.update({ id }, updateMediaDto);
+    const mediaUpdated = await this.mediaRepository.update(
+      { id },
+      updateMediaDto,
+    );
+    return mediaUpdated;
   }
 
   async remove(id: number) {

@@ -28,8 +28,9 @@ export class PublicationsService {
             id: postId,
           },
         },
-        date,
+        date: new Date(date),
       });
+
       return publication;
     } catch (error) {
       if (error.code === 'P2025') {

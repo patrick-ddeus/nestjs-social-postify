@@ -1,6 +1,6 @@
 import { PrismaService } from '@/database';
 import { PostFactory } from '../factories';
-import { NotFoundException, ConflictException } from '@nestjs/common';
+import { NotFoundException } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { PostsService } from '@/posts/posts.service';
 import { PostRepository } from '@/posts/posts.repository';
@@ -48,13 +48,11 @@ describe('Post unit tests', () => {
   });
 
   describe('service update', () => {
-    it('should return conflict when there is already a username and title registered', async () => {
-      jest
-        .spyOn(repository, 'listOne')
-        .mockResolvedValueOnce(PostFactory.build());
+    it('should return NotFound when theres no post with provided id', async () => {
+      jest.spyOn(repository, 'update').mockRejectedValueOnce({ code: 'P2025' });
 
       const response = service.update(1, PostFactory.build());
-      expect(response).rejects.toThrow(new ConflictException());
+      expect(response).rejects.toThrow(new NotFoundException());
     });
 
     it('Should return media with the provided id', async () => {

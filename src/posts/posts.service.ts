@@ -20,18 +20,23 @@ export class PostsService {
     return this.postRepository.listAll();
   }
 
-  findOne(id: number) {
-    return this.postRepository.listOne({ id });
-  }
-
-  async update(id: number, updatePostDto: UpdatePostDto) {
-    const post = await this.postRepository.update({ id }, updatePostDto);
+  async findOne(id: number) {
+    const post = await this.postRepository.listOne({ id });
 
     if (!post) {
       throw new NotFoundException();
     }
 
     return post;
+  }
+
+  async update(id: number, updatePostDto: UpdatePostDto) {
+    try {
+      const post = await this.postRepository.update({ id }, updatePostDto);
+      return post;
+    } catch (error) {
+      if (error.code === 'P2025') throw new NotFoundException();
+    }
   }
 
   async remove(id: number) {
