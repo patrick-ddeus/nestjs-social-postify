@@ -46,8 +46,8 @@ export class PublicationsService {
     return await this.publicationsRepository.listAll({
       where: {
         date: {
-          gte: after ? after : undefined,
-          lte: published || after ? now : undefined,
+          lte: published ? now : undefined,
+          gte: after ? after : published === false ? new Date() : undefined,
         },
       },
     });
