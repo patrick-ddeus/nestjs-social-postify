@@ -27,7 +27,7 @@ export class PublicationsController {
 
   @Get()
   findAll(
-    @Query('published', new DefaultValuePipe(false), ParseBoolPipe)
+    @Query('published', new ParseBoolPipe({ optional: true }))
     published: boolean,
     @Query(
       'after',

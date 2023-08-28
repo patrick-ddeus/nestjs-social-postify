@@ -50,13 +50,14 @@ describe('PublicationsController (e2e)', () => {
     const publication = await publicationFactory.create(
       media.id,
       post.id,
-      new Date(),
+      new Date('2021-11-05'),
     );
 
-    return request(app.getHttpServer())
-      .get('/publications')
-      .expect(200)
-      .expect([
+    const { body, status } = await server.get('/publications');
+
+    expect(status).toBe(200);
+    expect(body).toEqual(
+      expect.arrayContaining([
         {
           id: publication.id,
           mediaId: media.id,
@@ -65,7 +66,8 @@ describe('PublicationsController (e2e)', () => {
           createdAt: publication.createdAt.toISOString(),
           updatedAt: publication.updatedAt.toISOString(),
         },
-      ]);
+      ]),
+    );
   });
 
   it('/publications/?published (GET) should return publications with status code 200 and published true', async () => {

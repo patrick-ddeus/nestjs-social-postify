@@ -47,7 +47,7 @@ export class PublicationsService {
       where: {
         date: {
           lte: published ? now : undefined,
-          gte: after ? after : published === false ? new Date() : undefined,
+          gte: after ? after : published === false ? now : undefined,
         },
       },
     });

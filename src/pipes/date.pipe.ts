@@ -8,9 +8,9 @@ import {
 
 @Injectable()
 export class ParseDatePipe implements PipeTransform<string, Date> {
-  private options: ParseBoolPipeOptions & { optional?: boolean };
+  private options: ParseBoolPipeOptions;
 
-  constructor(options?: ParseBoolPipeOptions & { optional?: boolean }) {
+  constructor(options?: ParseBoolPipeOptions) {
     this.options = options;
   }
 
