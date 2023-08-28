@@ -36,71 +36,172 @@ describe('PublicationsController (e2e)', () => {
     await helper.cleanDb();
   });
 
-  it('/publications (GET) should return all publications with status code 200', async () => {
-    const media = await mediaFactory.create(
-      'Instagram',
-      'https://www.instagram.com/USERNAME',
-    );
+  describe('/publications (GET)', () => {
+    it('should return all publications with status code 200', async () => {
+      const media = await mediaFactory.create(
+        'Instagram',
+        'https://www.instagram.com/USERNAME',
+      );
 
-    const post = await postFactory.create(
-      'Why you should have a guinea pig?',
-      'https://www.guineapigs.com/why-you-should-guinea',
-    );
+      const post = await postFactory.create(
+        'Why you should have a guinea pig?',
+        'https://www.guineapigs.com/why-you-should-guinea',
+      );
 
-    const publication = await publicationFactory.create(
-      media.id,
-      post.id,
-      new Date('2021-11-05'),
-    );
+      const publication = await publicationFactory.create(
+        media.id,
+        post.id,
+        true,
+      );
 
-    const { body, status } = await server.get('/publications');
+      const { body, status } = await server.get('/publications');
 
-    expect(status).toBe(200);
-    expect(body).toEqual(
-      expect.arrayContaining([
-        {
-          id: publication.id,
-          mediaId: media.id,
-          postId: post.id,
-          date: publication.date.toISOString(),
-          createdAt: publication.createdAt.toISOString(),
-          updatedAt: publication.updatedAt.toISOString(),
-        },
-      ]),
-    );
-  });
+      expect(status).toBe(200);
+      expect(body).toEqual(
+        expect.arrayContaining([
+          {
+            id: publication.id,
+            mediaId: media.id,
+            postId: post.id,
+            date: publication.date.toISOString(),
+            createdAt: publication.createdAt.toISOString(),
+            updatedAt: publication.updatedAt.toISOString(),
+          },
+        ]),
+      );
+    });
 
-  it('/publications/?published (GET) should return publications with status code 200 and published true', async () => {
-    const media = await mediaFactory.create(
-      'Instagram',
-      'https://www.instagram.com/USERNAME',
-    );
+    it('should return publications already published with status code 200 when published is true', async () => {
+      const media = await mediaFactory.create(
+        'Instagram',
+        'https://www.instagram.com/USERNAME',
+      );
 
-    const post = await postFactory.create(
-      'Why you should have a guinea pig?',
-      'https://www.guineapigs.com/why-you-should-guinea',
-    );
+      const post = await postFactory.create(
+        'Why you should have a guinea pig?',
+        'https://www.guineapigs.com/why-you-should-guinea',
+      );
 
-    const publication = await publicationFactory.create(
-      media.id,
-      post.id,
-      new Date('2022-11-05'),
-    );
+      for (let i = 0; i < 5; i++) {
+        const isPast = i % 2 === 0;
+        await publicationFactory.create(media.id, post.id, isPast);
+      }
 
-    const { status, body } = await server.get('/publications?published=true');
+      const { status, body } = await server.get('/publications?published=true');
 
-    expect(status).toBe(200);
-    expect(body).toEqual(
-      expect.arrayContaining([
-        {
-          id: publication.id,
-          date: publication.date.toISOString(),
-          mediaId: publication.mediaId,
-          postId: publication.postId,
-          updatedAt: publication.updatedAt.toISOString(),
-          createdAt: publication.createdAt.toISOString(),
-        },
-      ]),
-    );
+      expect(status).toBe(200);
+      expect(body).toHaveLength(3);
+    });
+
+    it('should return publications are not published yet with status code 200 when published is false', async () => {
+      const media = await mediaFactory.create(
+        'Instagram',
+        'https://www.instagram.com/USERNAME',
+      );
+
+      const post = await postFactory.create(
+        'Why you should have a guinea pig?',
+        'https://www.guineapigs.com/why-you-should-guinea',
+      );
+
+      for (let i = 0; i < 5; i++) {
+        const isPast = i % 2 === 0;
+        await publicationFactory.create(media.id, post.id, isPast);
+      }
+
+      const { status, body } = await server.get(
+        '/publications?published=false',
+      );
+
+      expect(status).toBe(200);
+      expect(body).toHaveLength(2);
+    });
+
+    it('should return publications after provided date with status code 200 when after is a valid date', async () => {
+      const media = await mediaFactory.create(
+        'Instagram',
+        'https://www.instagram.com/USERNAME',
+      );
+
+      const post = await postFactory.create(
+        'Why you should have a guinea pig?',
+        'https://www.guineapigs.com/why-you-should-guinea',
+      );
+
+      await publicationFactory.create(
+        media.id,
+        post.id,
+        false,
+        new Date('2023-9-02'),
+      );
+
+      await publicationFactory.create(
+        media.id,
+        post.id,
+        false,
+        new Date('2023-4-02'),
+      );
+
+      await publicationFactory.create(
+        media.id,
+        post.id,
+        false,
+        new Date('2023-12-02'),
+      );
+
+      const { status, body } = await server.get(
+        '/publications?after=2023-6-02',
+      );
+
+      expect(status).toBe(200);
+      expect(body).toHaveLength(2);
+    });
+
+    it('should return publications published after provided date with status 200 when after is a valid date and published is true', async () => {
+      const media = await mediaFactory.create(
+        'Instagram',
+        'https://www.instagram.com/USERNAME',
+      );
+
+      const post = await postFactory.create(
+        'Why you should have a guinea pig?',
+        'https://www.guineapigs.com/why-you-should-guinea',
+      );
+
+      await publicationFactory.create(
+        media.id,
+        post.id,
+        false,
+        new Date('2023-8-02'),
+      );
+
+      await publicationFactory.create(
+        media.id,
+        post.id,
+        false,
+        new Date('2023-4-02'),
+      );
+
+      await publicationFactory.create(
+        media.id,
+        post.id,
+        false,
+        new Date('2023-12-02'),
+      );
+
+      await publicationFactory.create(
+        media.id,
+        post.id,
+        false,
+        new Date('2023-12-02'),
+      );
+
+      const { status, body } = await server.get(
+        '/publications?after=2023-6-02&published=true',
+      );
+
+      expect(status).toBe(200);
+      expect(body).toHaveLength(1);
+    });
   });
 });

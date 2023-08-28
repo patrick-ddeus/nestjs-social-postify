@@ -85,7 +85,7 @@ export class PublicationsService {
       const publication = await this.publicationsRepository.delete({ id });
       return publication;
     } catch (error) {
-      throw new NotFoundException();
+      if (error.code === 'P2025') throw new NotFoundException();
     }
   }
 }

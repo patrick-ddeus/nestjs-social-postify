@@ -158,7 +158,7 @@ describe('MediasController (e2e)', () => {
         'https://www.guineapigs.com/why-you-should-guinea',
       );
 
-      await publicationFactory.create(media.id, post.id, new Date());
+      await publicationFactory.create(media.id, post.id, false);
 
       const { status } = await server.delete(`/medias/${media.id}`);
 
